@@ -5,6 +5,7 @@
   <title>Letter</title>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,600&display=swap');
 
     body{
       margin:0;
@@ -33,11 +34,11 @@
 
     #error{ color:red; margin-top:10px; font-size: 24px; }
     #message{ 
-      color:#ff5c8a; 
-      margin-top:10px; 
-      font-weight:bold; 
-      font-size:32px; 
-    }
+		color:#ff5c8a; 
+		margin-top:10px; 
+		font-weight:bold; 
+		font-size:32px; 
+	}
 
     #envelopeArea{ 
       display:none; 
@@ -47,6 +48,7 @@
       transform:translate(-50%, -50%);
     }
 
+    /* ENVELOPE WRAPPER */
     #envelope{
       width:280px;
       height:180px;
@@ -56,38 +58,45 @@
       perspective:1000px;
     }
 
-    /* LETTER */
+    /* LETTER - starts hidden inside */
     .letter{
       position:absolute;
       left:50%;
       bottom:12px;
-      width:300px;
-      height:260px;
+
+      /* bigger paper */
+      width:270px;
+      height:230px;
+
       transform:translateX(-50%) translateY(0);
       transition:transform .7s ease;
-      z-index:60;
+      z-index:20;
 
-      /* VERY IMPORTANT */
+      /* FIX SCROLL: allow mouse/scroll */
       pointer-events:auto;
     }
 
     .paper{
       background:#fff;
       border-radius:14px;
-      padding:20px;
+      padding:16px 18px;
       text-align:left;
       box-shadow:0 8px 16px rgba(0,0,0,.15);
       height:100%;
       box-sizing:border-box;
 
-      overflow-y:auto;
+      /* scroll works now */
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
 
-      /* Baskerville */
-      font-family: Baskerville, "Baskerville Old Face", "Times New Roman", serif;
-      font-size:20px;
-      line-height:1.6;
+      /* less cursive, still romantic */
+      font-family: "Baskerville Old Face", "Times New Roman", serif;
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.5;
     }
 
+    /* ENVELOPE BODY */
     .envBody{
       position:absolute;
       left:0;
@@ -100,7 +109,7 @@
       overflow:hidden;
       z-index:30;
     }
-
+		
     .leftFold{
       position:absolute;
       inset:0;
@@ -125,6 +134,7 @@
       pointer-events:none;
     }
 
+    /* TOP FLAP */
     .topFlap{
       position:absolute;
       left:0;
@@ -141,16 +151,19 @@
       box-shadow:0 6px 12px rgba(0,0,0,.15);
     }
 
+    /* OPEN STATE */
     #envelope.open .topFlap{
       transform:rotateX(-180deg);
       z-index:10;
     }
 
+    /* pull letter higher (because paper is bigger now) */
     #envelope.open .letter{
-      transform:translateX(-50%) translateY(-250px);
-      z-index:100;
+      transform:translateX(-50%) translateY(-220px);
+      z-index:50;
     }
 
+    /* HEART SEAL */
     .heart{
       position:absolute;
       left:50%;
@@ -183,13 +196,15 @@
       opacity:0;
       transform:translate(-50%, -50%) rotate(45deg) scale(.6);
     }
-
+	
+    /* done reading button */
     #doneBtn{
       margin-top:18px;
       display:none;
       background:#ff5c8a;
     }
 
+    /* bouquet overlay */
     #bouquet{
       position:fixed;
       inset:0;
@@ -197,7 +212,7 @@
       place-items:center;
       background:rgba(0,0,0,.18);
     }
-
+	
     #bouquet.show{ display:grid; }
 
     .bouquetCard{
@@ -225,21 +240,130 @@
       background:#ffd1dc;
       color:#333;
     }
-
+	
     .bouquetImg{
       width:220px;
       height:auto;
       display:block;
       margin:0 auto 12px auto;
+      animation:pop .35s ease;
     }
-
   </style>
 </head>
 
 <body>
+  <div id="codeArea">
+    <h2>Enter access code</h2>
+    <p>Hint: our special date ;)</p>
 
-  <!-- your HTML and JS below stays EXACTLY the same as before -->
-  <!-- I didn't touch your letter text or functions -->
+    <input id="codeInput" type="text" placeholder="Enter code">
+    <br><br>
+    <button onclick="checkCode()">Submit</button>
 
+    <p id="error"></p>
+    <p id="message"></p>
+  </div>
+
+  <div id="envelopeArea">
+    <div id="envelope" onclick="openEnvelope()">
+      <div class="letter">
+        <div class="paper">
+          My Dearest Jessica,<br>
+          I am not good with words, so I apologize if this love letter does not turn out like a typical one. I want to express my love for you. I have not always been good at showing it, but I want you to know that I love you so much, Jessica and I always will.<br>
+          I still remember the first time I talked to you. It was the most random encounter ever. I did not expect that random moment to turn into the best thing that ever happened to me. I remember how angelic and beautiful your voice sounded and until now I still love listening to it, it is so soothing and something about it makes me calm.<br>
+          You have asked me many times, “How did you fall in love with me?” As I told you, I already liked you from the start, but I truly began seeing you as my partner that day when I had an argument with my parents and was having a bad day. On my way down to my room, I heard a girl singing a goofy song from my laptop. It made me feel so at ease, as if nothing else in the world mattered in that moment. I forgot everything, everyone and all my problems just because a girl was singing a goofy song. I remember standing in front of my room just listening to you, because I knew that if I went in, you would stop singing. I stood there for a minute, listening to your angelic voice. It made me so happy that a tear of happiness fell from my eyes. I thought to myself that I love this girl and I don’t want anything else but to be with her and make her happy.<br>
+          We had a very good start to our relationship. We became close friends before dating, so we skipped a lot of the awkward phase that many couples experience. Our confession to each other might not have been the best way, but I do not regret it. We both loved it at that moment and we still love doing it to this day.<br>
+          There are so many things I love about you, Jessica. I love your personality and the way you are with other people. Yes, you might not always like interacting with people, and you might judge them sometimes, like I do, but you care deeply. You observe a lot, and that makes you notice the little things about people. You are a very good friend. I experienced that myself, and now that we are more than friends, I see how you are with your friends. They are very lucky to have someone as caring as you.<br>
+          I love how mentally mature you are and how you talk to people. I remember the other day when you were on a call with your mom, and her colleague was crying because she felt judged by everyone. You helped calm her down. You have such a caring way of speaking, and you sympathize with people. Your voice plays a big part in that too. I’m sure I’m not the only one who feels this way when we hear you speak.<br>
+          I love how patient you are. I know I get on your nerves many times, but you always try to understand me. I am so lucky to be loved by you and to be your partner. I want to make you feel the same. I know you say that you do, but I also know there is sometimes a small hesitation inside you when you say it because of how I treated you before. I do not want this love letter to turn into an apology letter, so I will not go too deep into that. I just promise to become the best version of myself and to be a man who truly deserves a wonderful woman like you.<br>
+          I love your laugh, and as I mentioned many times in this letter, I really love your voice. Whenever I hear you laugh or smile, it makes me so happy that I can make you happy. That is all I want. I even love how you snore. My night doesn’t feel complete if I don’t have my laptop beside me with you sleeping and snoring.<br>
+          I love your body, there is nothing I would change about it. You are the most gorgeous woman I have ever met. I’m very excited about your fitness journey not to see you getting slimmer, but to see you doing something that will make you feel good about yourself. Although you are already as perfect as you are, you still don’t like how you look. I wish you could see yourself how I see you, then you’ll see the most beautiful woman ever.<br>
+          I am so grateful for everything you have done for me. I will never forget how you contacted people on that Facebook page when I broke my phone and how you joined multiple Facebook groups to help me find work and a bed when I was moving out. Even though you didn’t know those people and even though they were from a country you have never been to, you did not hesitate to help me. I am truly thankful for that.<br>
+          I am also thankful that you have stayed by my side no matter what. Yes, we broke up a few times, but we always found our way back to each other because you kept choosing me.<br>
+          Jessica, you are my inspiration and motivation for everything. I work hard in the gym so I can proudly stand beside a beautiful woman like you without feeling undeserving. I work these jobs so I can see you and build a good future together and so I can give you the things you want.<br>
+          There is so much more I want to tell you, mahal, but this letter is already long. I was nervous that it wouldn’t be long enough, but once I started writing, everything came to my mind and my thoughts just poured onto this letter.<br>
+          I love you so much, Jessica Lei Linao De Leon. You are the most amazing woman I have ever met. I cannot wait to see you in June, to move in with you, to marry you, to have kids with you, MAYBE even have cows and guinea pigs, to explore the world together, and to spend the rest of my life with you.<br>
+          Forever yours,<br>
+          Auztin
+        </div>
+      </div>
+
+      <div class="envBody">
+        <div class="leftFold"></div>
+        <div class="rightFold"></div>
+        <div class="bottomFold"></div>
+      </div>
+
+      <div class="heart"></div>
+      <div class="topFlap"></div>
+    </div>
+
+    <button id="doneBtn" onclick="showBouquet()">done reading?</button>
+  </div>
+
+  <div id="bouquet" aria-hidden="true">
+    <div class="bouquetCard">
+      <img src="peonies.png" class="bouquetImg" alt="Peonies bouquet">
+      <div class="bouquetText">for you&lt;3</div>
+      <button class="closeBouquet" onclick="closeBouquet()">close</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="mitski.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+	  function checkCode(){
+		const code = document.getElementById("codeInput").value;
+
+		if(code === "10302025"){
+		  document.getElementById("error").innerText = "";
+		  document.getElementById("message").innerText = "Good girl";
+
+		  setTimeout(() => {
+			document.getElementById("codeArea").style.display = "none";
+			document.getElementById("envelopeArea").style.display = "block";
+		  }, 1000);
+		} else {
+		  document.getElementById("error").innerText = "Who's special date is that??🤨";
+		  document.getElementById("message").innerText = "";
+		}
+	  }
+
+	  function openEnvelope(){
+		const env = document.getElementById("envelope");
+		if(env.classList.contains("open")) return;
+
+		env.classList.add("open");
+		env.onclick = null;
+
+		// show button after opening
+		document.getElementById("doneBtn").style.display = "inline-block";
+
+		// background music fade in
+		const music = document.getElementById("bgMusic");
+		music.volume = 0;
+		music.play().catch(() => {});
+
+		const fadeInterval = setInterval(() => {
+		  if (music.volume < 0.4) {
+			music.volume = Math.min(music.volume + 0.01, 0.4);
+		  } else {
+			clearInterval(fadeInterval);
+		  }
+		}, 300);
+	  }
+
+	  function showBouquet(){
+		document.getElementById("bouquet").classList.add("show");
+		document.getElementById("bouquet").setAttribute("aria-hidden","false");
+	  }
+
+	  function closeBouquet(){
+		document.getElementById("bouquet").classList.remove("show");
+		document.getElementById("bouquet").setAttribute("aria-hidden","true");
+	  }
+  </script>
 </body>
 </html>
