@@ -258,6 +258,33 @@ button{
 #bouquet{
   display:none;
 }
+	#bouquet{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  background:rgba(0,0,0,.2);
+  z-index:10000;
+}
+
+#bouquet.show{
+  display:grid;
+}
+
+.bouquetCard{
+  width:320px;
+  border-radius:18px;
+  background:#fff;
+  padding:18px 18px 14px;
+  box-shadow:0 18px 50px rgba(0,0,0,.22);
+}
+
+.bouquetImg{
+  width:220px;
+  height:auto;
+  display:block;
+  margin:0 auto 12px auto;
+}
 
 #doneBtn{
   margin-top:18px;
