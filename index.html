@@ -1,290 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Letter</title>
+<meta charset="UTF-8" />
+<title>Letter</title>
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,600&display=swap');
+<style>
+body{
+  margin:0;
+  background:#f2aebaef;
+  font-family:monospace;
+  text-align:center;
+  padding-top:80px;
+}
 
-    body{
-      margin:0;
-      background:#f2aebaef;
-      font-family:monospace;
-      text-align:center;
-      padding-top:80px;
-    }
+input{
+  padding:10px;
+  font-size:16px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
 
-    input{
-      padding:10px;
-      font-size:16px;
-      border-radius:6px;
-      border:1px solid #ccc;
-    }
+button{
+  padding:10px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#ff5c8a;
+  color:white;
+  cursor:pointer;
+}
 
-    button{
-      padding:10px 20px;
-      font-size:16px;
-      border:none;
-      border-radius:6px;
-      background:#ff5c8a;
-      color:white;
-      cursor:pointer;
-    }
+#error{ color:red; margin-top:10px; font-size:24px; }
+#message{ color:#ff5c8a; margin-top:10px; font-weight:bold; font-size:32px; }
 
-    #error{ color:red; margin-top:10px; font-size: 24px; }
-    #message{ 
-		color:#ff5c8a; 
-		margin-top:10px; 
-		font-weight:bold; 
-		font-size:32px; 
-	}
+#envelopeArea{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+}
 
-    #envelopeArea{ 
-      display:none; 
-      position:fixed;
-      top:50%;
-      left:50%;
-      transform:translate(-50%, -50%);
-    }
+/* ENVELOPE WRAPPER */
+#envelope{
+  width:280px;
+  height:180px;
+  position:relative;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  perspective:1000px;
+  overflow:hidden;
+  border-radius:16px;
+}
+#envelope.open{ overflow:visible; }
 
-    /* ENVELOPE WRAPPER */
-    #envelope{
-      width:280px;
-      height:180px;
-      position:relative;
-      cursor:pointer;
-      transform-style:preserve-3d;
-      perspective:1000px;
-    }
+/* SLOT */
+#letterSlot{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:50;
+}
 
-    /* LETTER - starts hidden inside */
-    .letter{
-      position:absolute;
-      left:50%;
-      bottom:12px;
+/* LETTER */
+.letter{
+  position:absolute;
+  left:50%;
+  bottom:12px;
+  width:210px;
+  height:150px;
+  transform:translateX(-50%) translateY(220px);
+  z-index:60;
+  transition:transform .7s ease,width .35s ease,height .35s ease,opacity .15s ease,visibility .15s ease;
+  border-radius:12px;
+  pointer-events:auto;
+}
 
-      /* bigger paper */
-      width:270px;
-      height:230px;
+#envelope:not(.open) .letter{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
 
-      transform:translateX(-50%) translateY(0);
-      transition:transform .7s ease;
-      z-index:20;
+#envelope.open .letter{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translateX(-50%) translateY(-135px);
+  z-index:70;
+}
 
-      /* FIX SCROLL: allow mouse/scroll */
-      pointer-events:auto;
-    }
+/* PAPER */
+.paper{
+  position:relative;
+  height:100%;
+  box-sizing:border-box;
+  padding:14px 16px;
+  text-align:left;
+  font-family:Baskerville,"Baskerville Old Face","Times New Roman",serif;
+  font-size:18px;
+  line-height:1.55;
+  border-radius:12px;
+  overflow:hidden;
 
-    .paper{
-      background:#fff;
-      border-radius:14px;
-      padding:16px 18px;
-      text-align:left;
-      box-shadow:0 8px 16px rgba(0,0,0,.15);
-      height:100%;
-      box-sizing:border-box;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,0.02),
+      rgba(0,0,0,0.02) 2px,
+      rgba(255,255,255,0.02) 2px,
+      rgba(255,255,255,0.02) 4px
+    ),
+    linear-gradient(#fff,#fbfbfb);
 
-      /* scroll works now */
-      overflow:auto;
-      -webkit-overflow-scrolling: touch;
+  box-shadow:
+    0 14px 26px rgba(0,0,0,.22),
+    inset 0 -14px 22px rgba(0,0,0,.06);
+}
 
-      /* less cursive, still romantic */
-      font-family: "Baskerville Old Face", "Times New Roman", serif;
-      font-style: italic;
-      font-size: 20px;
-      line-height: 1.5;
-    }
+/* ===== FOLDED STATE (no readable text) ===== */
+#envelope.open .letter:not(.unfolded) .paper{
+  padding:0;
+  overflow:hidden;
+  color:transparent;
+  text-shadow:none;
+}
 
-    /* ENVELOPE BODY */
-    .envBody{
-      position:absolute;
-      left:0;
-      bottom:0;
-      width:280px;
-      height:180px;
-      background:#f0dade;
-      border-radius:16px;
-      box-shadow:0 12px 26px rgba(0,0,0,.18);
-      overflow:hidden;
-      z-index:30;
-    }
-		
-    .leftFold{
-      position:absolute;
-      inset:0;
-      background:rgba(243,168,187,.55);
-      clip-path:polygon(0 0, 0 100%, 50% 55%);
-      pointer-events:none;
-    }
+#envelope.open .letter:not(.unfolded) .paper::before,
+#envelope.open .letter:not(.unfolded) .paper::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  height:1px;
+  background:rgba(0,0,0,0.18);
+  box-shadow:0 1px 0 rgba(255,255,255,0.35);
+}
+#envelope.open .letter:not(.unfolded) .paper::before{ top:33%; }
+#envelope.open .letter:not(.unfolded) .paper::after{ top:66%; }
 
-    .rightFold{
-      position:absolute;
-      inset:0;
-      background:rgba(243,168,187,.55);
-      clip-path:polygon(100% 0, 100% 100%, 50% 55%);
-      pointer-events:none;
-    }
+/* ===== UNFOLDED WORD-LIKE SPACING ===== */
+.letter.unfolded{
+  position:fixed;
+  top:50%;
+  left:50%;
+  width:min(90vw, 850px);
+  height:min(88vh, 1000px);
+  transform:translate(-50%,-50%);
+  z-index:9999;
+  aspect-ratio:210 / 297;
+}
 
-    .bottomFold{
-      position:absolute;
-      inset:0;
-      background:#ee8ea7;
-      clip-path:polygon(-2% 100%, 100% 100%, 50% 55%);
-      pointer-events:none;
-    }
+.letter.unfolded .paper{
+  padding:70px 75px;     /* more document margin */
+  font-size:19px;
+  line-height:1.85;      /* WORD-like breathing space */
+  letter-spacing:0.2px;
+  overflow:auto;
+  color:#000;
+  text-indent: 40px;
+  margin: 0 0 10px 0;
+}
 
-    /* TOP FLAP */
-    .topFlap{
-      position:absolute;
-      left:0;
-      top:0;
-      width:280px;
-      height:100px;
-      background:#ff2a3f;
-      clip-path:polygon(0 0, 100% 0, 50% 100%);
-      transform-origin:50% 0;
-      transform:rotateX(0deg);
-      transition:transform .6s ease;
-      z-index:40;
-      border-radius:16px 16px 0 0;
-      box-shadow:0 6px 12px rgba(0,0,0,.15);
-    }
+/* make <br> behave like paragraph spacing */
+.letter.unfolded .paper br{
+  display:block;
+  content:"";
+  margin-bottom:18px;   /* paragraph spacing */
+}
 
-    /* OPEN STATE */
-    #envelope.open .topFlap{
-      transform:rotateX(-180deg);
-      z-index:10;
-    }
+/* ENVELOPE BODY */
+.envBody{
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:280px;
+  height:180px;
+  background:#f0dade;
+  border-radius:16px;
+  box-shadow:0 12px 26px rgba(0,0,0,.18);
+  overflow:hidden;
+  z-index:30;
+  pointer-events:none;
+}
 
-    /* pull letter higher (because paper is bigger now) */
-    #envelope.open .letter{
-      transform:translateX(-50%) translateY(-220px);
-      z-index:50;
-    }
+.leftFold,.rightFold,.bottomFold{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
 
-    /* HEART SEAL */
-    .heart{
-      position:absolute;
-      left:50%;
-      top:60%;
-      width:28px;
-      height:28px;
-      background:#c21833;
-      transform:translate(-50%, -50%) rotate(45deg);
-      z-index:45;
-      box-shadow:
-        0 6px 10px rgba(0,0,0,.25),
-        inset 0 2px 4px rgba(255,255,255,.2);
-      transition:opacity .3s ease, transform .3s ease;
-    }
+.leftFold{
+  background:rgba(243,168,187,.55);
+  clip-path:polygon(0 0, 0 100%, 50% 55%);
+}
+.rightFold{
+  background:rgba(243,168,187,.55);
+  clip-path:polygon(100% 0, 100% 100%, 50% 55%);
+}
+.bottomFold{
+  background:#ee8ea7;
+  clip-path:polygon(-2% 100%, 100% 100%, 50% 55%);
+}
 
-    .heart::before,
-    .heart::after{
-      content:"";
-      position:absolute;
-      width:28px;
-      height:28px;
-      background:#c21833;
-      border-radius:50%;
-    }
+/* TOP FLAP */
+.topFlap{
+  position:absolute;
+  left:0;
+  top:0;
+  width:280px;
+  height:100px;
+  background:#ff2a3f;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:50% 0;
+  transform:rotateX(0deg);
+  transition:transform .6s ease;
+  border-radius:16px 16px 0 0;
+  z-index:80;
+}
+#envelope.open .topFlap{
+  transform:rotateX(-180deg);
+  z-index:10;
+}
 
-    .heart::before{ top:-14px; left:0; }
-    .heart::after{ left:-14px; top:0; }
+/* HEART (stable) */
+.heart{
+  position:absolute;
+  left:50%;
+  top:60%;
+  width:28px;
+  height:28px;
+  background:#c21833;
+  transform:translate(-50%,-50%) rotate(45deg);
+  z-index:200;                 /* always above flap */
+  box-shadow:0 8px 14px rgba(0,0,0,.28);
+  transition:opacity .25s ease, transform .25s ease;
+  pointer-events:none;
+}
+.heart::before,
+.heart::after{
+  content:"";
+  position:absolute;
+  width:28px;
+  height:28px;
+  background:#c21833;
+  border-radius:50%;
+}
+.heart::before{ top:-14px; left:0; }
+.heart::after{ left:-14px; top:0; }
 
-    #envelope.open .heart{
-      opacity:0;
-      transform:translate(-50%, -50%) rotate(45deg) scale(.6);
-    }
-	
-    /* done reading button */
-    #doneBtn{
-      margin-top:18px;
-      display:none;
-      background:#ff5c8a;
-    }
+#envelope.open .heart{
+  opacity:0;
+  transform:translate(-50%,-50%) rotate(45deg) scale(.7);
+}
 
-    /* bouquet overlay */
-    #bouquet{
-      position:fixed;
-      inset:0;
-      display:none;
-      place-items:center;
-      background:rgba(0,0,0,.18);
-    }
-	
-    #bouquet.show{ display:grid; }
+/* bouquet hidden */
+#bouquet{
+  display:none;
+}
 
-    .bouquetCard{
-      width:320px;
-      border-radius:18px;
-      background:#fff;
-      padding:18px 18px 14px;
-      box-shadow:0 18px 50px rgba(0,0,0,.22);
-      animation:pop .35s ease;
-    }
-
-    @keyframes pop{
-      from{ transform:translateY(12px) scale(.95); opacity:0; }
-      to{ transform:translateY(0) scale(1); opacity:1; }
-    }
-
-    .bouquetText{
-      font-size:18px;
-      color:#ff5c8a;
-      font-weight:bold;
-      margin-bottom:12px;
-    }
-
-    .closeBouquet{
-      background:#ffd1dc;
-      color:#333;
-    }
-	
-    .bouquetImg{
-      width:220px;
-      height:auto;
-      display:block;
-      margin:0 auto 12px auto;
-      animation:pop .35s ease;
-    }
-  </style>
+#doneBtn{
+  margin-top:18px;
+  display:none;
+}
+</style>
 </head>
 
 <body>
   <div id="codeArea">
     <h2>Enter access code</h2>
     <p>Hint: our special date ;)</p>
-
     <input id="codeInput" type="text" placeholder="Enter code">
     <br><br>
     <button onclick="checkCode()">Submit</button>
-
     <p id="error"></p>
     <p id="message"></p>
   </div>
 
+  <div id="letterOverlay" onclick="foldBack()"></div>
+
   <div id="envelopeArea">
     <div id="envelope" onclick="openEnvelope()">
-      <div class="letter">
-        <div class="paper">
-          My Dearest Jessica,<br>
-          I am not good with words, so I apologize if this love letter does not turn out like a typical one. I want to express my love for you. I have not always been good at showing it, but I want you to know that I love you so much, Jessica and I always will.<br>
-          I still remember the first time I talked to you. It was the most random encounter ever. I did not expect that random moment to turn into the best thing that ever happened to me. I remember how angelic and beautiful your voice sounded and until now I still love listening to it, it is so soothing and something about it makes me calm.<br>
-          You have asked me many times, “How did you fall in love with me?” As I told you, I already liked you from the start, but I truly began seeing you as my partner that day when I had an argument with my parents and was having a bad day. On my way down to my room, I heard a girl singing a goofy song from my laptop. It made me feel so at ease, as if nothing else in the world mattered in that moment. I forgot everything, everyone and all my problems just because a girl was singing a goofy song. I remember standing in front of my room just listening to you, because I knew that if I went in, you would stop singing. I stood there for a minute, listening to your angelic voice. It made me so happy that a tear of happiness fell from my eyes. I thought to myself that I love this girl and I don’t want anything else but to be with her and make her happy.<br>
-          We had a very good start to our relationship. We became close friends before dating, so we skipped a lot of the awkward phase that many couples experience. Our confession to each other might not have been the best way, but I do not regret it. We both loved it at that moment and we still love doing it to this day.<br>
-          There are so many things I love about you, Jessica. I love your personality and the way you are with other people. Yes, you might not always like interacting with people, and you might judge them sometimes, like I do, but you care deeply. You observe a lot, and that makes you notice the little things about people. You are a very good friend. I experienced that myself, and now that we are more than friends, I see how you are with your friends. They are very lucky to have someone as caring as you.<br>
-          I love how mentally mature you are and how you talk to people. I remember the other day when you were on a call with your mom, and her colleague was crying because she felt judged by everyone. You helped calm her down. You have such a caring way of speaking, and you sympathize with people. Your voice plays a big part in that too. I’m sure I’m not the only one who feels this way when we hear you speak.<br>
-          I love how patient you are. I know I get on your nerves many times, but you always try to understand me. I am so lucky to be loved by you and to be your partner. I want to make you feel the same. I know you say that you do, but I also know there is sometimes a small hesitation inside you when you say it because of how I treated you before. I do not want this love letter to turn into an apology letter, so I will not go too deep into that. I just promise to become the best version of myself and to be a man who truly deserves a wonderful woman like you.<br>
-          I love your laugh, and as I mentioned many times in this letter, I really love your voice. Whenever I hear you laugh or smile, it makes me so happy that I can make you happy. That is all I want. I even love how you snore. My night doesn’t feel complete if I don’t have my laptop beside me with you sleeping and snoring.<br>
-          I love your body, there is nothing I would change about it. You are the most gorgeous woman I have ever met. I’m very excited about your fitness journey not to see you getting slimmer, but to see you doing something that will make you feel good about yourself. Although you are already as perfect as you are, you still don’t like how you look. I wish you could see yourself how I see you, then you’ll see the most beautiful woman ever.<br>
-          I am so grateful for everything you have done for me. I will never forget how you contacted people on that Facebook page when I broke my phone and how you joined multiple Facebook groups to help me find work and a bed when I was moving out. Even though you didn’t know those people and even though they were from a country you have never been to, you did not hesitate to help me. I am truly thankful for that.<br>
-          I am also thankful that you have stayed by my side no matter what. Yes, we broke up a few times, but we always found our way back to each other because you kept choosing me.<br>
-          Jessica, you are my inspiration and motivation for everything. I work hard in the gym so I can proudly stand beside a beautiful woman like you without feeling undeserving. I work these jobs so I can see you and build a good future together and so I can give you the things you want.<br>
-          There is so much more I want to tell you, mahal, but this letter is already long. I was nervous that it wouldn’t be long enough, but once I started writing, everything came to my mind and my thoughts just poured onto this letter.<br>
-          I love you so much, Jessica Lei Linao De Leon. You are the most amazing woman I have ever met. I cannot wait to see you in June, to move in with you, to marry you, to have kids with you, MAYBE even have cows and guinea pigs, to explore the world together, and to spend the rest of my life with you.<br>
-          Forever yours,<br>
-          Auztin
+
+      <div id="letterSlot">
+        <div class="letter" id="letter" onclick="toggleLetter(event)">
+          <div class="paper">
+			My Dearest Jessica,<br>
+            <p>I am not good with words, so I apologize if this love letter does not turn out like a typical one. I want to express my love for you. I have not always been good at showing it, but I want you to know that I love you so much, Jessica and I always will.</p>
+            I still remember the first time I talked to you. It was the most random encounter ever. I did not expect that random moment to turn into the best thing that ever happened to me. I remember how angelic and beautiful your voice sounded and until now I still love listening to it, it is so soothing and something about it makes me calm.</p>
+            You have asked me many times, “How did you fall in love with me?” As I told you, I already liked you from the start, but I truly began seeing you as my partner that day when I had an argument with my parents and was having a bad day. On my way down to my room, I heard a girl singing a goofy song from my laptop. It made me feel so at ease, as if nothing else in the world mattered in that moment. I forgot everything, everyone and all my problems just because a girl was singing a goofy song. I remember standing in front of my room just listening to you, because I knew that if I went in, you would stop singing. I stood there for a minute, listening to your angelic voice. It made me so happy that a tear of happiness fell from my eyes. I thought to myself that I love this girl and I don’t want anything else but to be with her and make her happy.</p>
+            We had a very good start to our relationship. We became close friends before dating, so we skipped a lot of the awkward phase that many couples experience. Our confession to each other might not have been the best way, but I do not regret it. We both loved it at that moment and we still love doing it to this day.</p>
+            There are so many things I love about you, Jessica. I love your personality and the way you are with other people. Yes, you might not always like interacting with people, and you might judge them sometimes, like I do, but you care deeply. You observe a lot, and that makes you notice the little things about people. You are a very good friend. I experienced that myself, and now that we are more than friends, I see how you are with your friends. They are very lucky to have someone as caring as you.</p>
+            I love how mentally mature you are and how you talk to people. I remember the other day when you were on a call with your mom, and her colleague was crying because she felt judged by everyone. You helped calm her down. You have such a caring way of speaking, and you sympathize with people. Your voice plays a big part in that too. I’m sure I’m not the only one who feels this way when we hear you speak.</p>
+            I love how patient you are. I know I get on your nerves many times, but you always try to understand me. I am so lucky to be loved by you and to be your partner. I want to make you feel the same. I know you say that you do, but I also know there is sometimes a small hesitation inside you when you say it because of how I treated you before. I do not want this love letter to turn into an apology letter, so I will not go too deep into that. I just promise to become the best version of myself and to be a man who truly deserves a wonderful woman like you.</p>
+            I love your laugh, and as I mentioned many times in this letter, I really love your voice. Whenever I hear you laugh or smile, it makes me so happy that I can make you happy. That is all I want. I even love how you snore. My night doesn’t feel complete if I don’t have my laptop beside me with you sleeping and snoring.</p>
+            I love your body, there is nothing I would change about it. You are the most gorgeous woman I have ever met. I’m very excited about your fitness journey not to see you getting slimmer, but to see you doing something that will make you feel good about yourself. Although you are already as perfect as you are, you still don’t like how you look. I wish you could see yourself how I see you, then you’ll see the most beautiful woman ever.</p>
+            I am so grateful for everything you have done for me. I will never forget how you contacted people on that Facebook page when I broke my phone and how you joined multiple Facebook groups to help me find work and a bed when I was moving out. Even though you didn’t know those people and even though they were from a country you have never been to, you did not hesitate to help me. I am truly thankful for that.</p>
+            I am also thankful that you have stayed by my side no matter what. Yes, we broke up a few times, but we always found our way back to each other because you kept choosing me.</p>
+            Jessica, you are my inspiration and motivation for everything. I work hard in the gym so I can proudly stand beside a beautiful woman like you without feeling undeserving. I work these jobs so I can see you and build a good future together and so I can give you the things you want.</p>
+            There is so much more I want to tell you, mahal, but this letter is already long. I was nervous that it wouldn’t be long enough, but once I started writing, everything came to my mind and my thoughts just poured onto this letter.</p>
+            I love you so much, Jessica Lei Linao De Leon. You are the most amazing woman I have ever met. I cannot wait to see you in June, to move in with you, to marry you, to have kids with you, MAYBE even have cows and guinea pigs, to explore the world together, and to spend the rest of my life with you.</p>
+            Forever yours,<br>
+            Auztin
+          </div>
         </div>
       </div>
 
@@ -314,56 +332,74 @@
   </audio>
 
   <script>
-	  function checkCode(){
-		const code = document.getElementById("codeInput").value;
+    const letter = () => document.getElementById("letter");
+    const letterSlot = () => document.getElementById("letterSlot");
+    const overlay = () => document.getElementById("letterOverlay");
 
-		if(code === "10302025"){
-		  document.getElementById("error").innerText = "";
-		  document.getElementById("message").innerText = "Good girl";
+    function checkCode(){
+      const code = document.getElementById("codeInput").value;
 
-		  setTimeout(() => {
-			document.getElementById("codeArea").style.display = "none";
-			document.getElementById("envelopeArea").style.display = "block";
-		  }, 1000);
-		} else {
-		  document.getElementById("error").innerText = "Who's special date is that??🤨";
-		  document.getElementById("message").innerText = "";
-		}
-	  }
+      if(code === "10302025"){
+        document.getElementById("error").innerText = "";
+        document.getElementById("message").innerText = "Good girl";
 
-	  function openEnvelope(){
-		const env = document.getElementById("envelope");
-		if(env.classList.contains("open")) return;
+        setTimeout(() => {
+          document.getElementById("codeArea").style.display = "none";
+          document.getElementById("envelopeArea").style.display = "block";
+        }, 1000);
+      } else {
+        document.getElementById("error").innerText = "Who's special date is that??🤨";
+        document.getElementById("message").innerText = "";
+      }
+    }
 
-		env.classList.add("open");
-		env.onclick = null;
+    function openEnvelope(){
+      const env = document.getElementById("envelope");
+      if(env.classList.contains("open")) return;
 
-		// show button after opening
-		document.getElementById("doneBtn").style.display = "inline-block";
+      env.classList.add("open");
+      env.onclick = null;
 
-		// background music fade in
-		const music = document.getElementById("bgMusic");
-		music.volume = 0;
-		music.play().catch(() => {});
+      const music = document.getElementById("bgMusic");
+      music.volume = 0;
+      music.play().catch(() => {});
+      const fadeInterval = setInterval(() => {
+        if (music.volume < 0.4) music.volume = Math.min(music.volume + 0.01, 0.4);
+        else clearInterval(fadeInterval);
+      }, 300);
+    }
 
-		const fadeInterval = setInterval(() => {
-		  if (music.volume < 0.4) {
-			music.volume = Math.min(music.volume + 0.01, 0.4);
-		  } else {
-			clearInterval(fadeInterval);
-		  }
-		}, 300);
-	  }
+    function toggleLetter(e){
+      e.stopPropagation();
+      const el = letter();
+      const isUnfolded = el.classList.contains("unfolded");
 
-	  function showBouquet(){
-		document.getElementById("bouquet").classList.add("show");
-		document.getElementById("bouquet").setAttribute("aria-hidden","false");
-	  }
+      if(!isUnfolded){
+        document.body.appendChild(el);
+        el.classList.add("unfolded");
+        overlay().classList.add("show");
+        document.getElementById("doneBtn").style.display = "inline-block";
+      } else {
+        foldBack();
+      }
+    }
 
-	  function closeBouquet(){
-		document.getElementById("bouquet").classList.remove("show");
-		document.getElementById("bouquet").setAttribute("aria-hidden","true");
-	  }
+    function foldBack(){
+      const el = letter();
+      el.classList.remove("unfolded");
+      overlay().classList.remove("show");
+      letterSlot().appendChild(el);
+    }
+
+    function showBouquet(){
+      document.getElementById("bouquet").classList.add("show");
+      document.getElementById("bouquet").setAttribute("aria-hidden","false");
+    }
+
+    function closeBouquet(){
+      document.getElementById("bouquet").classList.remove("show");
+      document.getElementById("bouquet").setAttribute("aria-hidden","true");
+    }
   </script>
 </body>
 </html>
