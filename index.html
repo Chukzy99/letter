@@ -310,10 +310,24 @@ button{
   font-weight:bold;
   margin-bottom:12px;
 }
-.closeBouquet{
-  background:#ffd1dc;
-  color:#333;
+<style>
+  
+.bouquetClue{
+   margin-top:10px;
+   font-family: monospace;
 }
+
+  .closeBouquet{
+    display:block;
+    margin:20px auto 0 auto;
+    padding:8px 20px;
+    border:none;
+    border-radius:8px;
+    background:#ff5c8a;
+    color:white;
+    cursor:pointer;
+  }
+
 </style>
 </head>
 
@@ -394,11 +408,13 @@ button{
   <div id="bouquet" aria-hidden="true">
     <div class="bouquetCard">
       <img src="peonies.png" class="bouquetImg" alt="Peonies bouquet">
-      <div class="bouquetText">for you&lt;3</div>
-        also... check your ate's room😉
-      <button class="closeBouquet" onclick="closeBouquet()">close</button>
+       <div class="bouquetText">for you&lt;3</div>
+          <div class="bouquetClue">
+            also... check your ate's room 😉
+          </div>
+          <button class="closeBouquet" onclick="closeBouquet()">close</button>
+          </div>
     </div>
-  </div>
 
   <audio id="bgMusic" loop>
     <source src="mitski.mp3" type="audio/mpeg">
