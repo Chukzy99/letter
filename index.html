@@ -289,7 +289,12 @@ button{
   left:50%;
   transform:translateX(-50%);
   z-index:10002;
-  bottom:24px;
+
+  top:auto;
+  bottom:auto;
+
+  width:auto;
+  height:auto;
 }
 
 /* BOUQUET */
@@ -431,21 +436,23 @@ button{
   const overlay = () => document.getElementById("letterOverlay");
 
   function positionDoneBtn(){
-    const btn = document.getElementById("doneBtn");
-    const el = document.getElementById("letter");
-    if(!el.classList.contains("unfolded")) return;
+  const btn = document.getElementById("doneBtn");
+  const el = document.getElementById("letter");
+  if(!el.classList.contains("unfolded")) return;
 
-    const r = el.getBoundingClientRect();
-    let top = r.bottom + 10;
+  const r = el.getBoundingClientRect();
+  const gap = 10; // make this 6 if you want closer
+  const top = r.bottom + gap;
 
-    if(top > window.innerHeight - 60){
-      btn.style.top = "";
-      btn.style.bottom = "24px";
-    } else {
-      btn.style.bottom = "";
-      btn.style.top = top + "px";
-    }
+  // if it would go off screen, pin it near bottom
+  if(top > window.innerHeight - 60){
+    btn.style.top = "auto";
+    btn.style.bottom = "24px";
+  } else {
+    btn.style.bottom = "auto";
+    btn.style.top = top + "px";
   }
+}
   window.addEventListener("resize", positionDoneBtn);
 
   function checkCode(){
