@@ -286,12 +286,11 @@ button{
 /* DONE BTN */
 #doneBtn{
   display:none;
-  position: sticky;
-  bottom: 18px;
-  margin-top: 22px;
-  margin-left: auto;
-  margin-right: auto;
-  z-index: 10001;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10002;
+  bottom:24px; 
 }
 
 /* BOUQUET */
@@ -338,6 +337,24 @@ button{
   color:white;
   cursor:pointer;
 }
+  function positionDoneBtn(){
+  const btn = document.getElementById("doneBtn");
+  const el = document.getElementById("letter");
+  if(!el.classList.contains("unfolded")) return;
+
+  const r = el.getBoundingClientRect();
+  let top = r.bottom + 14;
+
+  // hvis det går utenfor skjermen, legg den nederst
+  if(top > window.innerHeight - 60){
+    btn.style.top = "";
+    btn.style.bottom = "24px";
+  } else {
+    btn.style.bottom = "";
+    btn.style.top = top + "px";
+  }
+}
+window.addEventListener("resize", positionDoneBtn);
 </style>
 </head>
 
@@ -475,6 +492,7 @@ button{
       overlay().classList.add("show");
       /* also keep it visible here */
       document.getElementById("doneBtn").style.display = "block";
+      positionDoneBtn();
     } else {
       foldBack();
     }
@@ -486,6 +504,8 @@ button{
     overlay().classList.remove("show");
     letterSlot().appendChild(el);
     document.getElementById("doneBtn").style.display = "none";
+    document.getElementById("doneBtn").style.top = "";
+    document.getElementById("doneBtn").style.bottom = "24px";
   }
 
   function showBouquet(){
