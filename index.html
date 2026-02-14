@@ -100,7 +100,7 @@ button{
   z-index:70;
 }
 
-/* PAPER (MAKE EVERYTHING MATCH THE GREETING FONT) */
+/* PAPER (MATCH GREETING FONT) */
 .paper{
   position:relative;
   height:100%;
@@ -108,7 +108,6 @@ button{
   padding:14px 16px;
   text-align:left;
 
-  /* cursive for whole letter */
   font-family:"Brush Script MT","Lucida Handwriting","Apple Chancery",cursive;
   font-size:24px;
   line-height:1.55;
@@ -157,7 +156,7 @@ button{
 #envelope.open .letter:not(.unfolded) .paper::before{ top:33%; }
 #envelope.open .letter:not(.unfolded) .paper::after{ top:66%; }
 
-/* ===== UNFOLDED (A4) ===== */
+/* ===== UNFOLDED ===== */
 .letter.unfolded{
   position:fixed;
   top:50%;
@@ -283,14 +282,14 @@ button{
   transform:translate(-50%,-50%) rotate(45deg) scale(.7);
 }
 
-/* DONE BTN */
+/* DONE BTN (outside the letter) */
 #doneBtn{
   display:none;
   position:fixed;
   left:50%;
   transform:translateX(-50%);
   z-index:10002;
-  bottom:24px; 
+  bottom:24px;
 }
 
 /* BOUQUET */
@@ -337,24 +336,6 @@ button{
   color:white;
   cursor:pointer;
 }
-  function positionDoneBtn(){
-  const btn = document.getElementById("doneBtn");
-  const el = document.getElementById("letter");
-  if(!el.classList.contains("unfolded")) return;
-
-  const r = el.getBoundingClientRect();
-  let top = r.bottom + 14;
-
-  // hvis det går utenfor skjermen, legg den nederst
-  if(top > window.innerHeight - 60){
-    btn.style.top = "";
-    btn.style.bottom = "24px";
-  } else {
-    btn.style.bottom = "";
-    btn.style.top = top + "px";
-  }
-}
-window.addEventListener("resize", positionDoneBtn);
 </style>
 </head>
 
@@ -377,7 +358,6 @@ window.addEventListener("resize", positionDoneBtn);
       <div id="letterSlot">
         <div class="letter" id="letter" onclick="toggleLetter(event)">
           <div class="paper">
-
             <p class="greeting">My Dearest Jessica,</p>
 
             <p>I'm not good with words, so I apologize if this love letter doesn't turn out like your typical love letter. I want to express my love for you. I haven't always been good at showing it, but I want you to know that I love you so much Jessica and I always will.</p>
@@ -414,7 +394,6 @@ window.addEventListener("resize", positionDoneBtn);
               <p class="signatureLine">Forever yours,</p>
               Auztin
             </div>
-                <button id="doneBtn" onclick="showBouquet()">done reading?</button>
           </div>
         </div>
       </div>
@@ -429,6 +408,9 @@ window.addEventListener("resize", positionDoneBtn);
       <div class="topFlap"></div>
     </div>
   </div>
+
+  <!-- DONE BUTTON (OUTSIDE LETTER) -->
+  <button id="doneBtn" onclick="showBouquet()">done reading?</button>
 
   <div id="bouquet" aria-hidden="true">
     <div class="bouquetCard">
@@ -447,6 +429,24 @@ window.addEventListener("resize", positionDoneBtn);
   const letter = () => document.getElementById("letter");
   const letterSlot = () => document.getElementById("letterSlot");
   const overlay = () => document.getElementById("letterOverlay");
+
+  function positionDoneBtn(){
+    const btn = document.getElementById("doneBtn");
+    const el = document.getElementById("letter");
+    if(!el.classList.contains("unfolded")) return;
+
+    const r = el.getBoundingClientRect();
+    let top = r.bottom + 14;
+
+    if(top > window.innerHeight - 60){
+      btn.style.top = "";
+      btn.style.bottom = "24px";
+    } else {
+      btn.style.bottom = "";
+      btn.style.top = top + "px";
+    }
+  }
+  window.addEventListener("resize", positionDoneBtn);
 
   function checkCode(){
     const code = document.getElementById("codeInput").value;
@@ -490,8 +490,9 @@ window.addEventListener("resize", positionDoneBtn);
       document.body.appendChild(el);
       el.classList.add("unfolded");
       overlay().classList.add("show");
-      /* also keep it visible here */
-      document.getElementById("doneBtn").style.display = "block";
+
+      const btn = document.getElementById("doneBtn");
+      btn.style.display = "block";
       positionDoneBtn();
     } else {
       foldBack();
@@ -503,9 +504,11 @@ window.addEventListener("resize", positionDoneBtn);
     el.classList.remove("unfolded");
     overlay().classList.remove("show");
     letterSlot().appendChild(el);
-    document.getElementById("doneBtn").style.display = "none";
-    document.getElementById("doneBtn").style.top = "";
-    document.getElementById("doneBtn").style.bottom = "24px";
+
+    const btn = document.getElementById("doneBtn");
+    btn.style.display = "none";
+    btn.style.top = "";
+    btn.style.bottom = "24px";
   }
 
   function showBouquet(){
