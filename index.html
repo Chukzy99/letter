@@ -441,7 +441,7 @@ button{
   if(!el.classList.contains("unfolded")) return;
 
   const r = el.getBoundingClientRect();
-  const gap = 10; // make this 6 if you want closer
+  const gap = 6;
   const top = r.bottom + gap;
 
   // if it would go off screen, pin it near bottom
